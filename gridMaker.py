@@ -1,13 +1,18 @@
-import cv2
+# Import the required modules
 import os
+import cv2
 
+# API to validate the numerical values
 def validate(inp):
+    # Check if the string contains int values
     try:
         return int(inp);
+    # Else return None
     except ValueError:
         return None;
 
-def make_grid(imgPath, rows, cols, offset, square, bnw, invert, yPrio, thickness, color):
+# API to create the grid
+def make_grid(imgPath, rows=10, cols=10, offset=(0,0), square=False, bnw=False, invert=False, rowPrio=False, thickness=1, color=(255,0,0,1)):
     # Validate all integer values
     rows = validate(rows);
     cols = validate(cols);
@@ -18,12 +23,15 @@ def make_grid(imgPath, rows, cols, offset, square, bnw, invert, yPrio, thickness
         return "VALUE_ERROR";
 
     # Read the image file
-    img = cv2.imread(imgPath);
-    if img.size == 0:
+    try:
+        img = cv2.imread(imgPath);
+        # Read dimensions of the image
+        dimensions = img.shape;
+    except:
         return "FILE_ERROR";
 
-    # Extract file name and extension
-    outputFileName = imgPath.split("\\")[-1].split(".")[0]+"_grid";
+    # Extract file name and set it to the output folder
+    outputFileName = "gridImages\\" + imgPath.split("\\")[-1].split(".")[0]+"_grid";
 
     # Check if the image has to pass through any of the filters
     # Convert to black and white
@@ -34,39 +42,40 @@ def make_grid(imgPath, rows, cols, offset, square, bnw, invert, yPrio, thickness
     if invert:
         img = cv2.bitwise_not(img);
         outputFileName += "_inv";
-    
-    # Read dimensions of the image
-    dimensions = img.shape;
 
     # Calculate step size for both axis
-    x_step = int(dimensions[1] / cols);
-    y_step = int(dimensions[0] / rows);
+    xStep = int(dimensions[1] / cols);
+    yStep = int(dimensions[0] / rows);
 
     # Circular shift the offset if they overflow
-    x_offset = offset[0] % x_step;
-    y_offset = offset[1] % y_step;
+    xOffset = offset[0] % xStep;
+    yOffset = offset[1] % yStep;
 
     # Check if the square option is selected
     if square:
         # Give priority to the respective axis
-        if yPrio:
-            x_step = y_step;
+        if rowPrio:
+            xStep = yStep;
         else:
-            y_step = x_step;
+            yStep = xStep;
 
     # Draw vertical lines of the grid
-    for x in range(x_offset, dimensions[1], x_step):
+    for x in range(xOffset, dimensions[1], xStep):
         # cv.Line(img, pt1, pt2, color, thickness=1, lineType=8, shift=0);
         img = cv2.line(img, (x, 0), (x, dimensions[0]), color, thickness);
 
     # Draw horizontal lines of the grid
-    for y in range(y_offset + dimensions[0], 0, (-1*y_step)):
+    for y in range(yOffset + dimensions[0], 0, (-1*yStep)):
         # cv.Line(img, pt1, pt2, color, thickness=1, lineType=8, shift=0);
         img = cv2.line(img, (0, y), (dimensions[1], y), color, thickness);
 
-    outputPath = os.path.join(".\\gridImages\\", (outputFileName +'.jpg'));
-    print(outputPath);
-    # Save the image
-    print(cv2.imwrite(outputPath, img));
+    # Add the extension to the output file name
+    outputFileName += ".jpg";
+    # Get the current working directory of the .py file
+    outputPath = os.path.dirname(os.path.abspath(__file__));
+    # Save the image an return error is something goes wrong
+    if not (cv2.imwrite(os.path.join(outputPath, outputFileName), img)):
+        return "UNKNOWN_ERROR";
 
-    return outputPath;
+    # Return the output file path
+    return os.path.join(outputPath, outputFileName);
