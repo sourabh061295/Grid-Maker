@@ -12,7 +12,7 @@ def validate(inp):
         return None;
 
 # API to create the grid
-def make_grid(imgPath, rows=10, cols=10, offset=(0,0), square=False, bnw=False, invert=False, rowPrio=False, thickness=1, color=(255,0,0,1)):
+def make_grid(imgPath, rows=10, cols=10, offset=(0,0), square=False, bnw=False, invert=False, binary=False, rowPrio=False, thickness=1, color=(255,0,0,1)):
     # Validate all integer values
     rows = validate(rows);
     cols = validate(cols);
@@ -35,9 +35,13 @@ def make_grid(imgPath, rows=10, cols=10, offset=(0,0), square=False, bnw=False, 
 
     # Check if the image has to pass through any of the filters
     # Convert to black and white
-    if bnw:
+    if bnw or binary:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY);
-        outputFileName += "_bnw";
+        if binary:
+            (thresh, img) = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY);
+            outputFileName += "_bin";
+        else:
+            outputFileName += "_bnw";
     # Convert to a color invert
     if invert:
         img = cv2.bitwise_not(img);

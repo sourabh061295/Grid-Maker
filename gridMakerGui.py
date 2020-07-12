@@ -55,6 +55,7 @@ class MyApp(App):
         self.rowPrioCheckBox.active = False;
         self.bnwCheckBox.active = False;
         self.invertCheckBox.active = False;
+        self.binaryCheckBox.active = False;
         self.colorButton.background_color = (1, 0, 0, 1);
 
     # API to apply the grid config
@@ -70,14 +71,15 @@ class MyApp(App):
         bnw = self.bnwCheckBox.active;
         invert = self.invertCheckBox.active;
         square = self.squareCheckBox.active;
+        binary = self.binaryCheckBox.active;
         rowPrio = self.rowPrioCheckBox.active;
         # Scale up the colors and retain the opacity factor
         color = [ l*255 for l in list(self.colorButton.background_color)[:2]];
         color.append(self.colorButton.background_color[3]);
 
         # Call the grid creation API and collect the error or the output file path
-        outputFilePath = GM.make_grid(imgPath=img,rows=rows, cols=cols, offset=offset, square=square, bnw=bnw, invert=invert,
-                            rowPrio=rowPrio, thickness=thickness, color=tuple(color));
+        outputFilePath = GM.make_grid(imgPath=img,rows=rows, cols=cols, offset=offset, square=square, bnw=bnw, invert=invert, 
+                            binary=binary, rowPrio=rowPrio, thickness=thickness, color=tuple(color));
 
         # Error handling for invalid input values 
         if outputFilePath == "VALUE_ERROR":
@@ -139,33 +141,37 @@ class MyApp(App):
         self.yOffsetInput = TextInput(multiline=False, size_hint=(0.25, 0.075), hint_text="0");
 
         # Fourth row of the GUI
-        self.bnwLabel = Label(text ='Grayscale', size_hint =(0.125, 0.075));
-        self.bnwCheckBox = CheckBox(active = False, size_hint =(0.125, 0.075));
-        self.invertLabel = Label(text ='Invert', size_hint =(0.125, 0.075));
-        self.invertCheckBox = CheckBox(active = False, size_hint =(0.125, 0.075));
-        self.squareLabel = Label(text ='Square', size_hint =(0.125, 0.075));
-        self.squareCheckBox = CheckBox(active = False, size_hint =(0.125, 0.075));
-        self.rowPrioLabel = Label(text ='Row priority', size_hint =(0.125, 0.075));
-        self.rowPrioCheckBox = CheckBox(active = False, size_hint =(0.125, 0.075));
+        self.bnwLabel = Label(text ='Grayscale', size_hint =(0.166, 0.075));
+        self.bnwCheckBox = CheckBox(active = False, size_hint =(0.166, 0.075));
+        self.invertLabel = Label(text ='Invert', size_hint =(0.166, 0.075));
+        self.invertCheckBox = CheckBox(active = False, size_hint =(0.166, 0.075));
+        self.binaryLabel = Label(text ='Binary', size_hint =(0.166, 0.075));
+        self.binaryCheckBox = CheckBox(active = False, size_hint =(0.166, 0.075));
+        
+        # Fifth row of GUI
+        self.squareLabel = Label(text ='Square', size_hint =(0.25, 0.075));
+        self.squareCheckBox = CheckBox(active = False, size_hint =(0.25, 0.075));
+        self.rowPrioLabel = Label(text ='Row priority', size_hint =(0.25, 0.075));
+        self.rowPrioCheckBox = CheckBox(active = False, size_hint =(0.25, 0.075));
         # Disable the checkbox by default 
         # self.rowPrioLabel.disabled = True;
         # self.rowPrioCheckBox.disabled = True;
 
-        # Fifth row of the GUI
+        # Sixth row of the GUI
         self.thicknessLabel = Label(text="Thickness:", size_hint=(0.25, 0.075));
         self.thicknessInput = TextInput(multiline=False, size_hint=(0.25, 0.075), hint_text="1");
         self.colorButton = Button(text="Color", size_hint=(0.5, 0.075), background_color =(1, 0, 0, 1));
         self.colorButton.bind(on_press = self.colorDialog);
 
-        # Sixth row of the GUI
+        # Seventh row of the GUI
         self.resetButton = Button(text ='Reset', size_hint = (0.5, 0.075));
         self.resetButton.bind(on_press = self.resetAll);
         self.applyButton = Button(text ='Apply', size_hint =(0.5, 0.075));
         self.applyButton.bind(on_press = self.apply);
 
         # Image canvas at the bottom of the GUI
-        self.outputImage = Image(source ='assets\\welcome.jpg', size_hint = (1, 0.4));
-        self.disclaimerLabel = Label(text="", size_hint=(1, 0.075));
+        self.outputImage = Image(source ='assets\\welcome.jpg', size_hint = (1, 0.38));
+        self.disclaimerLabel = Label(text="", size_hint=(1, 0.05));
 
         # Add all the defined widgets accordingly
         SL.add_widget(self.imageLabel);
@@ -183,6 +189,8 @@ class MyApp(App):
         SL.add_widget(self.bnwCheckBox);
         SL.add_widget(self.invertLabel);
         SL.add_widget(self.invertCheckBox);
+        SL.add_widget(self.binaryLabel);
+        SL.add_widget(self.binaryCheckBox);
         SL.add_widget(self.squareLabel);
         SL.add_widget(self.squareCheckBox);
         SL.add_widget(self.rowPrioLabel);
